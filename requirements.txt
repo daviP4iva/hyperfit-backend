@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+asyncpg  # If using PostgreSQL async
+pydantic
+pydantic[email]
+motor
+python-dotenv  # For loading .env variables
+passlib[bcrypt]  # For password hashing
+python-jose[cryptography]  # For JWT auth
+httpx  # For making async API requests
+pytest  # For testing
+pytest-asyncio  # For async test support
+logger
