@@ -1,22 +1,22 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 from api import userControler
-from db.session import connect_to_mongo
+from db.session import connect_to_mongo, close_mongo_connection
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    await connect_to_mongo()
+    yield
+    # Shutdown
+    await close_mongo_connection()
 
 app = FastAPI(
     title="HyperFit API",
     description="Backend service for HyperFit - AI-powered fitness application",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
-
-@app.on_event("startup")
-async def startup_db_client():
-    await connect_to_mongo()
-
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    await close_mongo_connection()
 
 # Include routers
 app.include_router(userControler.router, prefix="/api/v1")
@@ -27,4 +27,4 @@ async def read_root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True) 
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True) 
