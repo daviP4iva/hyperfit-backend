@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from api import userControler
+from api import deepseek
 from db.session import connect_to_mongo, close_mongo_connection
 
 @asynccontextmanager
@@ -20,6 +21,7 @@ app = FastAPI(
 
 # Include routers
 app.include_router(userControler.router, prefix="/api/v1")
+app.include_router(deepseek.router, prefix="/api/v1")
 
 @app.get("/")
 async def read_root():

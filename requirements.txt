@@ -12,3 +12,4 @@ httpx  # For making async API requests
 pytest  # For testing
 pytest-asyncio  # For async test support
 logger
+openai
