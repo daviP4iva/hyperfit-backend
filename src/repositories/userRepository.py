@@ -38,3 +38,26 @@ async def get_user_by_id(user_id: str):
         return user
     return None
 
+async def get_or_create_user_by_google_id(google_id: str, email: str, name: str):
+    collection = get_user_collection()
+    user = await collection.find_one({"google_id": google_id})
+    if user:
+        user["_id"] = str(user["_id"])
+        return user
+    # Si no existe, creamos el usuario
+    user_dict = {
+        "name": name,
+        "email": email,
+        "password": "",  # No hay password para Google
+        "tipo_cuenta": "Personal",
+        "altura": 0.0,
+        "peso": 0.0,
+        "nivel": "Principiante",
+        "objetivo": "Mantener",
+        "alergenos": "",
+        "google_id": google_id
+    }
+    result = await collection.insert_one(user_dict)
+    user_dict["_id"] = str(user_dict["_id"])
+    return user_dict
+
