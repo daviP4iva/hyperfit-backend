@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from api import userControler
-from src.api import chatbot
+from api import chatbot
 from db.session import connect_to_mongo, close_mongo_connection
 from fastapi.middleware.cors import CORSMiddleware
 
