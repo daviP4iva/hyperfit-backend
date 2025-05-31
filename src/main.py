@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from api import userControler
-from api import deepseek
+from src.api import chatbot
 from db.session import connect_to_mongo, close_mongo_connection
+from fastapi.middleware.cors import CORSMiddleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -19,9 +20,16 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite todos los métodos, incluyendo OPTIONS
+    allow_headers=["*"],
+)
 # Include routers
 app.include_router(userControler.router, prefix="/api/v1")
-app.include_router(deepseek.router, prefix="/api/v1")
+app.include_router(chatbot.router, prefix="/api/v1")
 
 @app.get("/")
 async def read_root():
