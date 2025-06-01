@@ -13,3 +13,4 @@ pytest  # For testing
 pytest-asyncio  # For async test support
 logger
 openai
+pymongo[srv]

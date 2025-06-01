@@ -1,4 +1,8 @@
 import bcrypt
+from jose import jwt
+import os
+from services import userService
+
 
 def hash_password(password: str):
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')

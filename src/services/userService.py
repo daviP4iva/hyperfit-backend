@@ -12,14 +12,11 @@ async def create_user(user: User):
 async def get_user_by_email(email: str):
     user = await userRepository.get_user_by_email(email)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        return None
     return user
 
 async def delete_user_by_email(email: str):
-    user = await userRepository.delete_user_by_email(email)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
+    await userRepository.delete_user_by_email(email)
 
 async def get_user_by_id(user_id: str):
     user = await userRepository.get_user_by_id(user_id)

@@ -1,3 +1,5 @@
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import ConnectionFailure
 import os
@@ -8,15 +10,15 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 MONGO_URI = os.getenv("MONGO_URI")
-DB_NAME = os.getenv("DB_NAME")
 
 async def connect_to_mongo():
     global client, db
     try:
-        client = AsyncIOMotorClient(MONGO_URI)
-        await client.admin.command('ismaster')
-        db = client[DB_NAME]
-        logger.info("Connected to MongoDB")
+        client = AsyncIOMotorClient(MONGO_URI, server_api=ServerApi('1'))
+        db = client.hyperfit
+        await client.admin.command('ping')
+        logger.info("Successfully connected to MongoDB")
+        return db
     except ConnectionFailure as e:
         logger.error(f"MongoDB connection failed: {e}")
         raise
