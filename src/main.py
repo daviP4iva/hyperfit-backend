@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from api import userControler
-from api import deepseek
+from api import chatbot
 from db.session import connect_to_mongo, close_mongo_connection
 from api import googleAuthController
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -20,6 +21,7 @@ app = FastAPI(
 
 # Include routers
 app.include_router(userControler.router, prefix="/api/v1")
+app.include_router(chatbot.router, prefix="/api/v1")
 app.include_router(googleAuthController.router, prefix="/api/v1")
 app.include_router(deepseek.router, prefix="/api/v1")
 
