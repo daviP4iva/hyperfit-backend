@@ -3,8 +3,9 @@ import os
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from dotenv import load_dotenv
-import jwt
 import asyncio
+from jose import jwt
+from services import userService
 
 load_dotenv()
 
