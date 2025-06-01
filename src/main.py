@@ -3,15 +3,14 @@ from contextlib import asynccontextmanager
 from api import userControler
 from api import chatbot
 from db.session import connect_to_mongo, close_mongo_connection
-from fastapi.middleware.cors import CORSMiddleware
+from api import googleAuthController
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
-    await connect_to_mongo()
-    yield
-    # Shutdown
-    await close_mongo_connection()
+   await connect_to_mongo()
+   yield
+   await close_mongo_connection()
 
 app = FastAPI(
     title="HyperFit API",
@@ -20,16 +19,11 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_credentials=True,
-    allow_methods=["*"],  # Permite todos los métodos, incluyendo OPTIONS
-    allow_headers=["*"],
-)
 # Include routers
 app.include_router(userControler.router, prefix="/api/v1")
 app.include_router(chatbot.router, prefix="/api/v1")
+app.include_router(googleAuthController.router, prefix="/api/v1")
+app.include_router(deepseek.router, prefix="/api/v1")
 
 @app.get("/")
 async def read_root():

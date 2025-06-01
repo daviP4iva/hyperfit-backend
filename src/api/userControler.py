@@ -24,7 +24,8 @@ async def get_user_by_email_endpoint(email: str):
 @router.delete("/{email}")
 async def delete_user_by_email_endpoint(email: str):
     try:
-        return await userService.delete_user_by_email(email)
+        await userService.delete_user_by_email(email)
+        return {"message": "User deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

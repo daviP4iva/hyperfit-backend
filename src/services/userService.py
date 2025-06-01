@@ -1,9 +1,10 @@
 from repositories import userRepository
 from models.userModel import User
 from fastapi import HTTPException
-from services import authService
+
 
 async def create_user(user: User):
+    from services import authService
     if await get_user_by_email(user.email):
         raise HTTPException(status_code=400, detail="User already exists")
     user = await userRepository.create_user(user)
@@ -12,14 +13,11 @@ async def create_user(user: User):
 async def get_user_by_email(email: str):
     user = await userRepository.get_user_by_email(email)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        return None
     return user
 
 async def delete_user_by_email(email: str):
-    user = await userRepository.delete_user_by_email(email)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
+    await userRepository.delete_user_by_email(email)
 
 async def get_user_by_id(user_id: str):
     user = await userRepository.get_user_by_id(user_id)
@@ -29,3 +27,6 @@ async def get_user_by_id(user_id: str):
 
 async def get_all_users():
     return await userRepository.get_all_users()
+
+async def get_or_create_user_by_google_id(google_id: str, email: str, name: str):
+    return await userRepository.get_or_create_user_by_google_id(google_id, email, name)

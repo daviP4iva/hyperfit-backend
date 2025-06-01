@@ -12,4 +12,10 @@ httpx  # For making async API requests
 pytest  # For testing
 pytest-asyncio  # For async test support
 logger
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
 openai
+pymongo[srv]
+
