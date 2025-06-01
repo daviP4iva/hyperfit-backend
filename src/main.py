@@ -5,19 +5,17 @@ from api import deepseek
 from db.session import connect_to_mongo, close_mongo_connection
 from api import googleAuthController
 
-#@asynccontextmanager
-#async def lifespan(app: FastAPI):
-    # Startup
-   # await connect_to_mongo()
-   # yield
-    # Shutdown
-  #  await close_mongo_connection()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+   await connect_to_mongo()
+   yield
+   await close_mongo_connection()
 
 app = FastAPI(
     title="HyperFit API",
     description="Backend service for HyperFit - AI-powered fitness application",
     version="1.0.0",
-    #lifespan=lifespan
+    lifespan=lifespan
 )
 
 # Include routers
