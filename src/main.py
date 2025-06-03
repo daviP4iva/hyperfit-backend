@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from api import userControler
 from api import chatbotController
+from api import routineController
 from db.session import connect_to_mongo, close_mongo_connection
 from api import authController
 from fastapi.middleware.cors import CORSMiddleware
@@ -31,6 +32,7 @@ app.add_middleware(
 app.include_router(userControler.router, prefix="/api/v1")
 app.include_router(chatbotController.router, prefix="/api/v1")
 app.include_router(authController.router, prefix="/api/v1")
+app.include_router(routineController.router, prefix="/api/v1")
 
 @app.get("/")
 async def read_root():
