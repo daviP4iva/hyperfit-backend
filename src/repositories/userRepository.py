@@ -68,17 +68,31 @@ async def update_user(user_id: str, update_data: dict):
 
 async def get_or_create_user_by_google_id(google_id: str, email: str, name: str):
     collection = get_user_collection()
-    user = await collection.find_one({"email": email})
+    # First check if user exists with this google_id
+    user = await collection.find_one({"google_id": google_id})
     if user:
-        logger.error(f"User already exists: {user}")
+        logger.info(f"Found existing user with google_id: {user}")
         user["_id"] = str(user["_id"])
         return user, True
-    # Si no existe, creamos el usuario
+    
+    # If no user with google_id, check by email
+    user = await collection.find_one({"email": email})
+    if user:
+        # Update existing user with google_id
+        logger.info(f"Updating existing user with google_id: {user}")
+        result = await collection.update_one(
+            {"_id": user["_id"]},
+            {"$set": {"google_id": google_id}}
+        )
+        user["_id"] = str(user["_id"])
+        return user
+    
+    # Create new user if none exists
     user: User = User(
         name=name,
         email=email,
         google_id=google_id
     )
-    logger.error(f"Creating user: {user}")
+    logger.info(f"Creating new user with google_id: {user}")
     return await create_user(user), False
 

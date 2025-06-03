@@ -47,7 +47,10 @@ async def get_all_users():
     return await userRepository.get_all_users()
 
 async def get_or_create_user_by_google_id(google_id: str, email: str, name: str):
-    return await userRepository.get_or_create_user_by_google_id(google_id, email, name)
+    user, existed = await userRepository.get_or_create_user_by_google_id(google_id, email, name)
+    if not user:
+        raise HTTPException(status_code=500, detail="Failed to create or get user")
+    return user, existed
 
 async def update_user(user_id: str, update_data: dict):
     logger.error(f"Updating user {user_id} with data: {update_data}")
