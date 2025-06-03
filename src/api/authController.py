@@ -16,6 +16,10 @@ class UserRegister(BaseModel):
 class GoogleCallback(BaseModel):
     code: str
 
+class GoogleLoginResponse(BaseModel):
+    token: str
+    existed: bool
+
 router = APIRouter(prefix="/auth")
 logger = logging.getLogger(__name__)
 
@@ -84,7 +88,7 @@ async def google_callback(code: GoogleCallback):
             user_info = userinfo_response.json()
             
             # Create or get user
-            user = await userService.get_or_create_user_by_google_id(
+            user, existed = await userService.get_or_create_user_by_google_id(
                 user_info['sub'],
                 user_info['email'],
                 user_info.get('name', '')
@@ -92,8 +96,7 @@ async def google_callback(code: GoogleCallback):
             logger.error(f"User: {user}")
             
             # Generate JWT token
-            token = generate_token(user["_id"])
-            return {"token": token, "user": user}
+            return GoogleLoginResponse(token=generate_token(user["_id"]), existed=existed)
             
     except Exception as e:
         logger.error(f"Error in Google callback: {str(e)}")

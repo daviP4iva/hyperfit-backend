@@ -2,6 +2,7 @@ from db.session import get_user_collection
 from models.userModel import User
 from bson import ObjectId
 import logging
+from services import authService
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +71,8 @@ async def get_or_create_user_by_google_id(google_id: str, email: str, name: str)
     user = await collection.find_one({"email": email})
     if user:
         logger.error(f"User already exists: {user}")
-        return user
+        user["_id"] = str(user["_id"])
+        return user, True
     # Si no existe, creamos el usuario
     user: User = User(
         name=name,
@@ -78,5 +80,5 @@ async def get_or_create_user_by_google_id(google_id: str, email: str, name: str)
         google_id=google_id
     )
     logger.error(f"Creating user: {user}")
-    return await create_user(user)
+    return await create_user(user), False
 
