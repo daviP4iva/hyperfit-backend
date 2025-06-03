@@ -1,14 +1,24 @@
 from repositories import userRepository
 from models.userModel import User
 from fastapi import HTTPException
+from services import authService
+import logging
 
+logger = logging.getLogger(__name__)
 
 async def create_user(user: User):
-    from services import authService
     if await get_user_by_email(user.email):
         raise HTTPException(status_code=400, detail="User already exists")
-    user = await userRepository.create_user(user)
-    return authService.generate_token(user["_id"])
+    
+    # Hash the password before storing
+    user.password = authService.hash_password(user.password)
+    
+    # Create user in database
+    created_user = await userRepository.create_user(user)
+    logger.error(f"Created user: {created_user}")
+    
+    # Generate token using the user's _id
+    return authService.generate_token(created_user["_id"])
 
 async def get_user_by_email(email: str):
     user = await userRepository.get_user_by_email(email)
@@ -30,3 +40,7 @@ async def get_all_users():
 
 async def get_or_create_user_by_google_id(google_id: str, email: str, name: str):
     return await userRepository.get_or_create_user_by_google_id(google_id, email, name)
+
+async def update_user(user_id: str, update_data: dict):
+    logger.error(f"Updating user {user_id} with data: {update_data}")
+    return await userRepository.update_user(user_id, update_data)

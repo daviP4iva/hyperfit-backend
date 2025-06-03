@@ -1,12 +1,16 @@
 import bcrypt
 import os
+from fastapi import Request, HTTPException
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from dotenv import load_dotenv
 from jose import jwt
 from services import userService
+import logging
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 
@@ -22,12 +26,19 @@ def generate_token(user_id: str):
 def verify_token(token: str):
     return jwt.decode(token, os.getenv('JWT_SECRET'), algorithms=['HS256'])
 
-def get_user_from_token(token: str):
+async def get_user_from_token(token: str):
     decoded_token = jwt.decode(token, os.getenv('JWT_SECRET'), algorithms=['HS256'])
     user_id = decoded_token.get('user_id')
     from services import userService
-    user = userService.get_user_by_id(user_id)
+    user = await userService.get_user_by_id(user_id)
     return user
+
+async def get_user_by_request(request: Request):
+    token = request.headers.get('Authorization')
+    if not token:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    return await get_user_from_token(token[7:])
+
 
 async def google_auth(token: str):
     try:
@@ -39,7 +50,7 @@ async def google_auth(token: str):
         user = await userService.get_or_create_user_by_google_id(user_id, email, name)
         return generate_token(user["_id"])
     except Exception as e:
-        print("Error verificando token de Google:", e)
+        print("Error verifying Google token:", e)
         return None
 
 
