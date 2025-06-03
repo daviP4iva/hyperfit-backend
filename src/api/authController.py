@@ -23,6 +23,14 @@ GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
 
+class Login(BaseModel):
+    email: str
+    password: str
+
+
+@router.post("/login")
+async def login(login: Login):
+    return await userService.login(login.email, login.password)
 
 @router.post("/register")
 async def register(user: UserRegister):

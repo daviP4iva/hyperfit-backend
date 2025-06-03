@@ -6,6 +6,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+async def login(email: str, password: str):
+    user = await userRepository.get_user_by_email(email)
+    if not user:
+        raise HTTPException(status_code=400, detail="User not found")
+    if not authService.verify_password(password, user["password"]):
+        raise HTTPException(status_code=400, detail="Invalid password")
+    return authService.generate_token(user["_id"])
+
 async def create_user(user: User):
     if await get_user_by_email(user.email):
         raise HTTPException(status_code=400, detail="User already exists")
